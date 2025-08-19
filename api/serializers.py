@@ -23,11 +23,15 @@ class SlotSerializer(serializers.ModelSerializer):
         fields = ('id', 'start_time', 'end_time')
 
 class AppointmentSerializer(serializers.ModelSerializer):
+    doctor_name = serializers.CharField(source="doctor.name", read_only=True)
+    slot_time = serializers.SerializerMethodField()
 
     class Meta:
         model = Appointment
-        fields = ('id', 'patient_name', 'age', 'appointment_date', 'slot', 'doctor')
+        fields = ["id", "patient_name", "age", "appointment_date", "slot", "doctor", "doctor_name", "slot_time"]
 
+    def get_slot_time(self, obj):
+        return f"{obj.slot.start_time} - {obj.slot.end_time}"
 
     def validate(self, attrs):
         appointment_date = attrs.get('appointment_date')
